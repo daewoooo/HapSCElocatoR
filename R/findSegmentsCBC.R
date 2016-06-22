@@ -63,6 +63,7 @@ findSegmentsCBC <- function(data=NULL, minSeg=0, smooth=3) {
   }
     
   recombs <- GenomicRanges::GRangesList()
+  seqlevels(recombs) <- seqlevels(segments)
   for (i in 1:length(segments)) {
     segm <- segments[[i]]
     index <- names(segments[i])

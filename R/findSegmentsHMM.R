@@ -38,42 +38,44 @@ findSegmentsHMM <- function(data=NULL) {
   for (i in 1:length(data)) {
     chrom.binary <- data[[i]]
     index <- names(data[i])
-    print(index)
     comp.vector <- as.numeric(chrom.binary[,5])  
     
-    observed <- as.character(comp.vector)
-    postProbs <- posterior(hmm, observed)
-    
-    maxProbs <- apply(postProbs, 2, max)
-    toswitch <- which(maxProbs < 0.5)
-    
-    maxiter <- 1
-    while (length(toswitch)>0 & maxiter<=5) {
-      switched.vals <- sapply(observed[toswitch], switchValue)
-      observed[toswitch] <- switched.vals
+    if (length(comp.vector) > 1) {
+      observed <- as.character(comp.vector)
       postProbs <- posterior(hmm, observed)
+    
       maxProbs <- apply(postProbs, 2, max)
       toswitch <- which(maxProbs < 0.5)
-      maxiter <- maxiter+1
-    } 
     
-    obsStates <- apply(postProbs, 2, which.max)
+      maxiter <- 1
+      while (length(toswitch)>0 & maxiter<=5) {
+        switched.vals <- sapply(observed[toswitch], switchValue)
+        observed[toswitch] <- switched.vals
+        postProbs <- posterior(hmm, observed)
+        maxProbs <- apply(postProbs, 2, max)
+        toswitch <- which(maxProbs < 0.5)
+        maxiter <- maxiter+1
+      } 
     
-    dirs <- obsStates
-    dirs[dirs == 1] <- "c"
-    dirs[dirs == 2] <- "w"
-    dirs[dirs == 3] <- "wc" 
+      obsStates <- apply(postProbs, 2, which.max)
     
-    strand <- chrom.binary$strand
-    strand[strand == 0] <- "+"
-    strand[strand == 1] <- "-"
+      dirs <- obsStates
+      dirs[dirs == 1] <- "c"
+      dirs[dirs == 2] <- "w"
+      dirs[dirs == 3] <- "wc" 
     
-    frag.gr <- GenomicRanges::GRanges(seqnames=chrom.binary$seqnames, IRanges(start=chrom.binary$start, end=chrom.binary$end), strand=strand, state=obsStates, direction=dirs)
-    segs <- collapseBins(frag.gr, id.field = 2)
-    segments[[index]] <- segs
+      strand <- chrom.binary$strand
+      strand[strand == 0] <- "+"
+      strand[strand == 1] <- "-"
+    
+      frag.gr <- GenomicRanges::GRanges(seqnames=chrom.binary$seqnames, IRanges(start=chrom.binary$start, end=chrom.binary$end), strand=strand, state=obsStates, direction=dirs)
+      segs <- collapseBins(frag.gr, id.field = 2)
+      segments[[index]] <- segs
+    }  
   }
   
   recombs <- GenomicRanges::GRangesList()
+  seqlevels(recombs) <- seqlevels(segments)
   for (i in 1:length(segments)) {
     segm <- segments[[i]]
     index <- names(segments[i])
