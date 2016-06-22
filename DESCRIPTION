@@ -1,0 +1,28 @@
+Package: YeastSCElocator
+Type: Package
+Title: Find SCEs in Strand-seq data from yeast
+Version: 0.1
+Date: 2015-10-05
+Author: David Porubsky
+Maintainer: David Porubsky <d.porubsky@umcg.nl>
+Description: This package implements functions for finding breakpoints, plottingand export of strand-seq data.
+Depends:
+  R (>= 3.1.0),
+  GenomicRanges,
+  ggplot2,
+  reshape2,
+  cowplot
+Imports:
+  IRanges,
+  Rsamtools,
+  GenomicAlignments,
+  grid,
+  gtools
+Suggests:
+  knitr,
+  testthat
+License: 
+LazyLoad: yes
+VignetteBuilder: knitr
+Packaged: 2016-07-19 13:13:00 CET+1; Porubsky
+RoxygenNote: 5.0.1
