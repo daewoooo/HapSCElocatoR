@@ -2,11 +2,10 @@
 #' 
 #' @param data A list of integer vectors of zeros and ones
 #' @import GenomicRanges
-#' @import HMM
+#' @import mgcv
 #' @author David Porubsky
-#' @export
 
-findSegmentsHMM <- function(data=NULL) {
+findSegmentsGAM <- function(data=NULL) {
   
   switchValue <- function(x) {
     if (x == '1') {
@@ -26,23 +25,6 @@ findSegmentsHMM <- function(data=NULL) {
     return(collapsed.gr)
   }
   
-  # 3states HMM
-  States <- c("0","1","2")
-  Symbols <- c("0","1")
-  startProbs <- rep(1/length(States), length(States))
-  emissionProbs <- matrix(c(0.95,0.05,0.5,0.05,0.95,0.5),3,2)
-  transProbs <- matrix(0.05,3,3)
-  diag(transProbs) <- 0.95
-  hmm <- initHMM(States, Symbols, startProbs, transProbs, emissionProbs)
-  
-  # 2states HMM
-  #States <- c("0","1")
-  #Symbols <- c("0","1")
-  #startProbs <- rep(1/length(States), length(States))
-  #emissionProbs <- matrix(c(0.9,0.1,0.1,0.9),2,2)
-  #transProbs <- matrix(0.05,2,2)
-  #diag(transProbs) <- 0.95
-  #hmm <- initHMM(States, Symbols, startProbs, transProbs, emissionProbs)
   
   segments <- GenomicRanges::GRangesList()
   for (i in 1:length(data)) {
@@ -51,8 +33,13 @@ findSegmentsHMM <- function(data=NULL) {
     comp.vector <- as.numeric(chrom.binary[,5])  
     
     if (length(comp.vector) > 1) {
-      observed <- as.character(comp.vector)
-      postProbs <- posterior(hmm, observed)
+      observed <- comp.vector
+      numObs <- seq(1,length(observed))
+      
+      foo <- gam(observed~s(numObs),family="binomial")
+      predict(foo,type="response")
+      
+      #__END__#
     
       maxProbs <- apply(postProbs, 2, max)
       toswitch <- which(maxProbs < 0.5)
@@ -83,9 +70,7 @@ findSegmentsHMM <- function(data=NULL) {
       segs <- collapseBins(frag.gr, id.field = 2)
       segs$numReads <- counts$lengths
       
-      if (!is.null(smooth)) {
-        
-      }
+      
       
       segments[[index]] <- segs
     }  

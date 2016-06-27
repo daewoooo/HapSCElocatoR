@@ -8,7 +8,7 @@
 #' @author David Porubsky
 #' @export
  
-findSegmentsCBS <- function(data=NULL, minSeg=0, smooth=3) {
+findSegmentsCBC <- function(data=NULL, minSeg=0, smooth=3) {
   
   switchValue <- function(x) {
     if (x == 1) {

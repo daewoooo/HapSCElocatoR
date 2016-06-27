@@ -51,7 +51,7 @@ localizeSCE <- function(bamfilepath, dataDirectory="./SCE_analysis", min.mapq=10
       
       frag.binary <- split(frag.df, frag.df$seqnames)
       
-      if (method == "CBC") {
+      if (method == "CBS") {
         bam.segm <- findSegmentsCBC(data=frag.binary, minSeg=minSeg, smooth=smooth)
       } else if (method == "HMM") {
         bam.segm <- findSegmentsHMM(data=frag.binary)
