@@ -1,4 +1,4 @@
-YeastSCElocatoR - A tool to localize SCE breakpoint in yeast Strand-seq data
+HapSCElocatoR - A tool to localize SCE breakpoint in haploid Strand-seq data
 
 Copyright (C)	"2016 David Porubsky
 	        Contributors: David Porubsky, Ashley D. Sanders
