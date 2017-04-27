@@ -54,8 +54,9 @@ exportUCSC <- function(index, outputDirectory, fragments=NULL, segments=NULL, re
       bedfile$strand <- '.'
       bedfile$thickStart <- 0
       bedfile$thickEnd <- 0
-      levels(segments$strand) <- c("103,139,139", "243,165,97", "0,102,0")
-      bedfile$itemRgb <- segments$strand
+      segments$direction <- factor(segments$direction)
+      levels(segments$direction) <- c("103,139,139", "243,165,97", "0,102,0")
+      bedfile$itemRgb <- segments$direction
       bedfile <- bedfile[c('chromosome','start','end','name','score','strand','thickStart','thickEnd','itemRgb')]
     } else {
       bedfile <- data.frame(chromosome='chrI', start=1, end=1, name=NA, mapq=0, strand='.')

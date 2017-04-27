@@ -11,7 +11,7 @@
 #' @author David Porubsky
 #' @export
 
-bam2ranges <- function(file, bamindex=file, min.mapq=10, pairedEndReads=FALSE) {
+bam2ranges <- function(file, bamindex=file, min.mapq=10, pairedEndReads=FALSE, chromosomes=NULL) {
   ## Check if bamindex exists
   bamindex.raw <- sub('\\.bai$', '', bamindex)
   bamindex <- paste0(bamindex.raw,'.bai')
@@ -20,19 +20,32 @@ bam2ranges <- function(file, bamindex=file, min.mapq=10, pairedEndReads=FALSE) {
     warning("Couldn't find BAM index-file ",bamindex,". Creating our own file ",bamindex.own," instead.")
     bamindex <- bamindex.own
   }
-  
   file.header <- Rsamtools::scanBamHeader(file)[[1]]
   chrom.lengths <- file.header$targets
   chroms.in.data <- names(chrom.lengths)
-  
-  ## Import the file into GRanges
-  gr <- GenomicRanges::GRanges(seqnames=Rle(chroms.in.data), ranges=IRanges(start=rep(1, length(chroms.in.data)), end=chrom.lengths[chroms.in.data]))
- 
-  if (pairedEndReads) {
-    suppressWarnings( data.raw <- GenomicAlignments::readGAlignmentPairs(file, index=bamindex, param=Rsamtools::ScanBamParam(which=range(gr), what='mapq', flag=scanBamFlag(isDuplicate=F))) )
-  } else {
-    suppressWarnings( data.raw <- GenomicAlignments::readGAlignments(file, index=bamindex, param=Rsamtools::ScanBamParam(which=range(gr), what='mapq', flag=scanBamFlag(isDuplicate=F))) )
+  if (is.null(chromosomes)) {
+    chromosomes <- chroms.in.data
   }
+  chroms2use <- intersect(chromosomes, chroms.in.data)
+  if (length(chroms2use)==0) {
+    chrstring <- paste0(chromosomes, collapse=', ')
+    stop('The specified chromosomes ', chrstring, ' do not exist in the data. Please try ', paste(paste0('chr',chromosomes), collapse=', '), ' instead.')
+  }
+  ## Issue warning for non-existent chromosomes
+  diff <- setdiff(chromosomes, chroms.in.data)
+  if (length(diff)>0) {
+    diffs <- paste0(diff, collapse=', ')
+    warning(paste0('Not using chromosomes ', diffs, ' because they are not in the data.'))
+  }
+  ## Import the file into GRanges
+  gr <- GenomicRanges::GRanges(seqnames=chroms2use, ranges=IRanges(start=rep(1, length(chroms2use)), end=chrom.lengths[chroms2use]))
+
+  if (pairedEndReads) {
+      data.raw <- GenomicAlignments::readGAlignmentPairs(file, index=bamindex, param=Rsamtools::ScanBamParam(tag="XA", which=range(gr), what='mapq', flag=scanBamFlag(isDuplicate=F)))
+  } else {
+      data.raw <- GenomicAlignments::readGAlignments(file, index=bamindex, param=Rsamtools::ScanBamParam(tag="XA", which=range(gr), what='mapq', flag=scanBamFlag(isDuplicate=F)))
+  }
+  
   
   ## Second mate of the pair will inherit directionality from the first mate of the pair
   if (pairedEndReads) {

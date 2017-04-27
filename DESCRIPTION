@@ -1,13 +1,13 @@
-Package: YeastSCElocator
+Package: HapSCElocatoR
 Type: Package
-Title: Find SCEs in Strand-seq data from yeast
+Title: Find SCEs in haploid Strand-seq data
 Version: 0.1
 Date: 2015-10-05
-Author: David Porubsky
+Author: David Porubsky, Ashley D Sanders
 Maintainer: David Porubsky <d.porubsky@umcg.nl>
-Description: This package implements functions for finding breakpoints, plottingand export of strand-seq data.
+Description: This package implements functions for finding SCEs in Strand-seq data, plotting and export processed data.
 Depends:
-  R (>= 3.1.0),
+  R (>= 3.3.0),
   GenomicRanges,
   ggplot2,
   reshape2,
@@ -17,7 +17,8 @@ Imports:
   Rsamtools,
   GenomicAlignments,
   grid,
-  gtools
+  gtools,
+  fastseg	
 Suggests:
   knitr,
   testthat
