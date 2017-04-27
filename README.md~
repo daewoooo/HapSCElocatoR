@@ -1,4 +1,4 @@
-# HapSCElocatoR
+# YeastSCElocatoR
 R Package to detect SCE breakpoints in haploid Strand-seq data
 This package uses CBC and HMM approach to segment the data
 
