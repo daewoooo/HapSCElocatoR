@@ -4,14 +4,14 @@
 \alias{localizeSCE}
 \title{Wrapper function for the YeastSCElocatoR package}
 \usage{
-localizeSCE(bamfilepath, dataDirectory = "./SCE_analysis",
+localizeSCE(inputDirectory, outputDirectory = "./SCE_analysis",
   chromosomes = NULL, min.mapq = 10, minSeg = 0, minSize = 0,
-  smooth = 1, method = "CBC")
+  smooth = 1, method = "CBS", hotspots = FALSE, read.len = 50)
 }
 \arguments{
-\item{bamfilepath}{Folder with BAM files to analyze}
+\item{inputDirectory}{Folder with BAM files to analyze}
 
-\item{dataDirectory}{Folder to output the results. If it does not exist it will be created.}
+\item{outputDirectory}{Folder to output the results. If it does not exist it will be created.}
 
 \item{min.mapq}{Minimum mapping quality when importing from BAM files.}
 

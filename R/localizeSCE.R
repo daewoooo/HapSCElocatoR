@@ -1,38 +1,38 @@
 #' Wrapper function for the YeastSCElocatoR package
 #'
-#' @param bamfilepath Folder with BAM files to analyze
-#' @param dataDirectory Folder to output the results. If it does not exist it will be created.
+#' @param inputDirectory Folder with BAM files to analyze
+#' @param outputDirectory Folder to output the results. If it does not exist it will be created.
 #' @param method
 
 #' @inheritParams bam2ranges
-#' @inheritParams findSegmentsCBC
+#' @inheritParams findSegmentsCBS
 #' @importFrom gtools mixedsort
 
 #' @author David Porubsky
 #' @export
 
-localizeSCE <- function(bamfilepath, dataDirectory="./SCE_analysis", chromosomes=NULL, min.mapq=10, minSeg=0, minSize=0, smooth=1, method="CBC", hotspots=FALSE, read.len=50) {
+localizeSCE <- function(inputDirectory, outputDirectory="./SCE_analysis", chromosomes=NULL, min.mapq=10, minSeg=0, minSize=0, smooth=1, method="CBS", hotspots=FALSE, read.len=50) {
   
-  if (!file.exists(dataDirectory)) {
-    dir.create(dataDirectory)  
+  if (!file.exists(outputDirectory)) {
+    dir.create(outputDirectory)  
   }
   
-  results <- file.path(dataDirectory, 'Results')
+  results <- file.path(outputDirectory, 'Results')
   if (!file.exists(results)) {
     dir.create(results)  
   }
   
-  browserpath <- file.path(dataDirectory, 'browserFiles')
+  browserpath <- file.path(outputDirectory, 'browserFiles')
   if (!file.exists(browserpath)) {
     dir.create(browserpath)  
   }
   
-  #plots <- file.path(dataDirectory, 'Plots')
+  #plots <- file.path(outputDirectory, 'Plots')
   #if (!file.exists(plots)) {
   #  dir.create(plots)  
   #}
   
-  bamfiles <- list.files(bamfilepath, full.names=TRUE, pattern = paste0('.bam$'))
+  bamfiles <- list.files(inputDirectory, full.names=TRUE, pattern = paste0('.bam$'))
   
   plots <- list()
   for (bam in bamfiles) {
@@ -54,7 +54,7 @@ localizeSCE <- function(bamfilepath, dataDirectory="./SCE_analysis", chromosomes
       
       frag.grl <- split(fragments, seqnames(fragments))
       
-      bam.segm <- findSegmentsCBC(data=frag.grl, minSeg=minSeg, minSize=minSize, smooth=smooth, read.len=read.len)
+      bam.segm <- findSegmentsCBS(data=frag.grl, minSeg=minSeg, minSize=minSize, smooth=smooth, read.len=read.len)
 
       if (length(bam.segm$segments) > 0) {
         segments.df <- as(bam.segm$segments, "data.frame")
@@ -139,7 +139,7 @@ localizeSCE <- function(bamfilepath, dataDirectory="./SCE_analysis", chromosomes
     }
     hotspot.ranges <- unlist(hotspot.ranges)
     hotspot.ranges.df <- as(hotspot.ranges, "data.frame")
-    destination <- file.path(dataDirectory, "hotspot_ranges.txt")
+    destination <- file.path(outputDirectory, "hotspot_ranges.txt")
     write.table(hotspot.ranges.df, file = destination, quote = F, row.names = F)
   
     all.breaks <- unlist(breaks.all.files)
@@ -147,16 +147,16 @@ localizeSCE <- function(bamfilepath, dataDirectory="./SCE_analysis", chromosomes
     names(all.breaks) <- NULL
     all.breaks.df <- as(all.breaks, 'data.frame')
     all.breaks.df$filenames <- filenames
-    destination <- file.path(dataDirectory, "breakpoint_ranges.txt")
+    destination <- file.path(outputDirectory, "breakpoint_ranges.txt")
     write.table(all.breaks.df, file = destination, quote = F, row.names = F)
   
     message("Exporting heatmap ...")
-    destination <- file.path(dataDirectory, "heatmap.pdf")
+    destination <- file.path(outputDirectory, "heatmap.pdf")
     plotHeatmap(datapath=results, hotspots=hotspots, plotLibraries = NULL, file=destination)
   }
   
   message("Exporting ideograms ...")
-  destination <- file.path(dataDirectory, "results_plots.pdf")
+  destination <- file.path(outputDirectory, "results_plots.pdf")
   pdf(destination, width = 10, height = 6)
   bquiet = lapply(plots, print)
   d <- dev.off()

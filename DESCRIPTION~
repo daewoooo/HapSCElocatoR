@@ -11,14 +11,14 @@ Depends:
   GenomicRanges,
   ggplot2,
   reshape2,
-  cowplot,
-  fastseg	
+  cowplot
 Imports:
   IRanges,
   Rsamtools,
   GenomicAlignments,
   grid,
-  gtools,	
+  gtools,
+  fastseg	
 Suggests:
   knitr,
   testthat

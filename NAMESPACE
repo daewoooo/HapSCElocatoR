@@ -2,7 +2,7 @@
 
 export(bam2ranges)
 export(exportUCSC)
-export(findSegmentsCBC)
+export(findSegmentsCBS)
 export(hotspotter)
 export(localizeSCE)
 export(plotHeatmap)
